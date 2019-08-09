@@ -1,0 +1,22 @@
+{
+  "name": "@housegeek/www",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "HouseGeek Ltd <dev@housegeek.co.uk>",
+  "homepage": "https://github.com/housegeek-ltd/monorepo/tree/master/packages/www#readme",
+  "license": "ISC",
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/housegeek-ltd/monorepo.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/housegeek-ltd/monorepo/issues"
+  }
+}

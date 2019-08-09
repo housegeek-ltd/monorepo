@@ -1,0 +1,18 @@
+{
+  "packages": [
+    "packages/*"
+  ],
+  "version": "0.0.0",
+  "npmClient": "npm",
+  "command": {
+    "version": {
+      "createRelease": true,
+      "includeMergedTags": true,
+      "exact": true,
+      "noPush": true,
+      "conventionalCommits": true,
+      "message": "chore(release): %s",
+      "allowBranch": "master"
+    }
+  }
+}
