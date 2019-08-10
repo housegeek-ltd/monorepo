@@ -6,7 +6,7 @@ jobs:
       - image: circleci/node:12.8.0
     steps:
       - checkout
-      - run: npm run install
+      - run: npm install
       - run: npm run compile
 
   unittest:
