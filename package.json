@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx lerna run --parallel test",
+    "build": "npx lerna bootstrap",
+    "test": "NODE_ENV=unittest npx lerna run --parallel test",
     "version": "npx lerna version --no-push --yes"
   },
   "repository": {

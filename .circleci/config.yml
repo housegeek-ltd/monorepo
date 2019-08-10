@@ -5,6 +5,8 @@ jobs:
       - image: circleci/node:12.8.0
     steps:
       - checkout
+
       - run: npm i
       - run: npm run build
+
       - run: npm t
