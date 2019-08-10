@@ -7,7 +7,7 @@
     "postinstall": "npx lerna bootstrap",
     "compile": "npx lerna run --parallel compile",
 
-    "unittest": "NODE_ENV=unittest npx lerna run --parallel --changed --include-merged-tags test",
+    "unittest": "NODE_ENV=unittest npx lerna run --parallel --since --include-merged-tags test",
 
     "build": "npx lerna run build",
     "pre-release": "npx lerna publish --no-push --yes --canary",
