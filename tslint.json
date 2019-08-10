@@ -1,0 +1,30 @@
+{
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint-config-standard"
+  ],
+  "jsRules": {},
+  "rules": {
+    "generator-star-spacing": "off",
+    "no-var": "error",
+    "prefer-const": "error",
+    "curly": ["error", "multi-line", "consistent"],
+    "no-else-return": "error",
+    "no-loop-func": "error",
+    "arrow-parens": ["error", "as-needed"],
+    "no-unneeded-ternary": "error",
+    "padded-blocks": ["error", "never"],
+    "quote-props": ["error", "consistent-as-needed"],
+    "no-console": "error",
+    "indent": [
+      "error",
+      2,
+      { "SwitchCase": 1 }
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ]
+  },
+  "rulesDirectory": []
+}

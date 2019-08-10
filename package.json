@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx lerna run --parallel test",
+    "version": "npx lerna version --no-push --yes"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/housegeek-ltd/monorepo.git"
   },
+  "private": true,
   "author": "HouseGeek Ltd <dev@housegeek.co.uk>",
   "license": "ISC",
   "bugs": {
@@ -17,6 +19,13 @@
   },
   "homepage": "https://github.com/housegeek-ltd/monorepo#readme",
   "devDependencies": {
-    "lerna": "^3.16.4"
+    "@types/node": "^12.7.1",
+    "lerna": "^3.16.4",
+    "nyc": "^14.1.1",
+    "sinon": "^7.4.1",
+    "tape": "^4.11.0",
+    "tslint": "^5.18.0",
+    "tslint-config-standard": "^8.0.1",
+    "typescript": "^3.5.3"
   }
 }

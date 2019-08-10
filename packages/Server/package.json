@@ -1,11 +1,11 @@
 {
-  "name": "@housegeek/www",
+  "name": "@housegeek/server",
   "version": "0.0.0",
-  "description": "> TODO: description",
+  "description": "Basic http server",
   "author": "HouseGeek Ltd <dev@housegeek.co.uk>",
   "homepage": "https://github.com/housegeek-ltd/monorepo/tree/master/packages/www#readme",
   "license": "ISC",
-  "main": "index.js",
+  "main": "dist/index.js",
   "publishConfig": {
     "access": "public"
   },
@@ -13,10 +13,18 @@
     "type": "git",
     "url": "git+ssh://git@github.com/housegeek-ltd/monorepo.git"
   },
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "dev": "npx tsc -w & nodemon dist/index.js",
+    "test": "npx nyc npx tape 'tests/**/*.test.js'",
+    "build": "npx tsc"
   },
   "bugs": {
     "url": "https://github.com/housegeek-ltd/monorepo/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.1",
+    "nodemon": "^1.19.1",
+    "typescript": "^3.5.3"
   }
 }
