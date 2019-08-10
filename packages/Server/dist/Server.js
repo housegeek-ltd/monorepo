@@ -92,20 +92,11 @@ class Server extends http_1.default.Server {
             if (handler.length === 3) {
                 if (error)
                     return next(error);
-                return handler
-                    .bind(this)(req, res, err => {
-                    if (err)
-                        return next(error);
-                    return next();
-                });
+                return handler.bind(this)(req, res, next);
             }
-            if (error)
-                return handler
-                    .bind(this)(error, req, res, err => {
-                    if (err)
-                        return next(err);
-                    return next();
-                });
+            if (error) {
+                return handler.bind(this)(error, req, res, next);
+            }
             return next();
         };
         next();

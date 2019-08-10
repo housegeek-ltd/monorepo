@@ -140,18 +140,12 @@ export default class Server extends http.Server {
             if (handler.length === 3) {
                 if (error) return next(error)
 
-                return (handler as reqHandler)
-                    .bind(this)(req, res, err => {
-                        if (err) return next(error)
-                        return next()
-                    })
+                return (handler as reqHandler).bind(this)(req, res, next)
             }
 
-            if (error) return (handler as errHandler)
-                .bind(this)(error, req, res, err => {
-                    if (err) return next(err)
-                    return next()
-                })
+            if (error) {
+                return (handler as errHandler).bind(this)(error, req, res, next)
+            }
 
             return next()
         }
