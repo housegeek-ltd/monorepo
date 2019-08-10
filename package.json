@@ -4,7 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx lerna bootstrap",
+    "postinstall": "npx lerna bootstrap",
+    "compile": "npx lerna run --parallel compile",
+
+    "unittest": "NODE_ENV=unittest npx lerna run --parallel --changed --include-merged-tags test",
+
+    "build": "npx lerna run build",
+    "pre-release": "npx lerna publish --no-push --yes --canary",
+    "release": "npx lerna publish --no-push --yes",
+
+    "citest": "NODE_ENV=ci npx lerna run citest",
+
     "test": "NODE_ENV=unittest npx lerna run --parallel test",
     "version": "npx lerna version --no-push --yes"
   },

@@ -1,12 +1,87 @@
 version: 2.1
 jobs:
-  build:
+
+  install:
     docker:
       - image: circleci/node:12.8.0
     steps:
       - checkout
+      - run: npm run install
+      - run: npm run compile
 
-      - run: npm i
-      - run: npm run build
+  unittest:
+    docker:
+      - image: circleci/node:12.8.0
+    steps:
+      - run: npm run unittest
+  
+  prerelease:
+    docker:
+      - image: circleci/node:12.8.0
+    steps:
+      - run: npm run prerelease
+  
+  release:
+    docker:
+      - image: circleci/node:12.8.0
+    steps:
+      - run: npm run release
+      - run: git add **CHANGELOG.md
+      - run: git commit --amend
 
-      - run: npm t
+  push:
+    docker:
+      - image: circleci/node:12.8.0
+    steps:
+      - run: npm push
+
+workflows:
+  version: 2.1
+  build:
+    jobs:
+      - install
+      - unittest:
+          requires:
+            - install
+
+      - prerelease:
+          requires:
+            - unittest
+          filters:
+            branches:
+              only: nightly
+
+      - release:
+          requires:
+            - unittest
+          filters:
+            branches:
+              only: master
+
+      - push:
+          requires:
+            - release
+          filters:
+            branches:
+              only: master
+
+      - build:
+          requires:
+            - release
+          filters:
+            branches:
+              only: master
+
+      - build:
+          requires:
+            - prerelease
+          filters:
+            branches:
+              only: nightly
+
+      - build:
+          requires:
+            - unittest
+          filters:
+            branches:
+              ignore: master, unittest
