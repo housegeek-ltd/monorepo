@@ -29,11 +29,17 @@ jobs:
       - run: git add **CHANGELOG.md
       - run: git commit --amend
 
+  build:
+    docker:
+      - image: circleci/node:12.8.0
+    steps:
+      - run: npm run build
+
   push:
     docker:
       - image: circleci/node:12.8.0
     steps:
-      - run: npm push
+      - run: git push
 
 workflows:
   version: 2.1
