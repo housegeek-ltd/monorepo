@@ -15,7 +15,7 @@
   },
   "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "npx tsc -w & nodemon dist/index.js",
+    "dev": "npx tsc -w",
     "test": "npx nyc npx tape 'tests/**/*.test.js'",
     "build": "npx tsc"
   },
