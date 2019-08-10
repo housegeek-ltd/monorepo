@@ -59,6 +59,9 @@ class Server extends http_1.default.Server {
             : ['/', arg0];
         setRouteHandler(this.routing, path.split('/'), 'all', handler);
     }
+    route(path, method, handler) {
+        setRouteHandler(this.routing, path.split('/'), method, handler);
+    }
     handleRequest(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const res = Object.assign(response, {

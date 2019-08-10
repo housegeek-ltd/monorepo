@@ -13,5 +13,6 @@ export default class Server extends http.Server {
     constructor();
     use(handler: reqHandler | errHandler): void;
     use(path: string, handler: reqHandler | errHandler): void;
+    route(path: string, method: string, handler: reqHandler | errHandler): void;
     handleRequest(request: Request, response: Response): Promise<Response | undefined>;
 }

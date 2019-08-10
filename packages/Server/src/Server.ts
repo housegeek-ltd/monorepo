@@ -86,6 +86,10 @@ export default class Server extends http.Server {
         setRouteHandler(this.routing, path.split('/'), 'all', handler as reqHandler | errHandler)
     }
 
+    route (path: string, method: string, handler: reqHandler | errHandler) {
+        setRouteHandler(this.routing, path.split('/'), method, handler as reqHandler | errHandler)
+    }
+
     async handleRequest (request: Request, response: Response) {
         const res: Response = Object.assign(
             response,
