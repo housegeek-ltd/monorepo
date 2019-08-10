@@ -1,12 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -48,9 +40,10 @@ function getRouteHandlers(routing, urlParts, methods = ['all'], handlers = [], p
     return handlers;
 }
 class Server extends http_1.default.Server {
-    constructor() {
+    constructor({ logger = console }) {
         super();
         this.routing = { handlers: [], routes: new Map() };
+        this.logger = logger;
         this.on('request', this.handleRequest);
     }
     use(arg0, arg1) {
@@ -63,52 +56,59 @@ class Server extends http_1.default.Server {
         setRouteHandler(this.routing, path.split('/'), method, handler);
     }
     handleRequest(request, response) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const res = Object.assign(response, {
-                append: Response_1.default.prototype.append.bind(response),
-                status: Response_1.default.prototype.status.bind(response),
-                send: Response_1.default.prototype.send.bind(response),
-                json: Response_1.default.prototype.json.bind(response),
-                setHeader: Response_1.default.prototype.setHeader.bind(response),
-                end: Response_1.default.prototype.end.bind(response)
-            });
-            if (!request.url || !request.method) {
-                return res.status(400).end();
-            }
-            const { url, method } = request;
-            const handlers = getRouteHandlers(this.routing, url.split('/'), ['all', method]);
-            let unHandledError;
-            for (const [handler, params] of handlers) {
-                const req = Object.assign(request, {
-                    params
-                });
-                yield new Promise((resolve, reject) => {
-                    if (handler.length === 3 && !unHandledError) {
-                        return handler.bind(this)(req, res, err => {
-                            if (err)
-                                return reject(err);
-                            return resolve();
-                        });
-                    }
-                    if (unHandledError) {
-                        handler.bind(this)(unHandledError, req, res, err => {
-                            if (err)
-                                return reject(err);
-                            return resolve();
-                        });
-                        unHandledError = void 0;
-                    }
-                }).catch(err => {
-                    unHandledError = err;
-                });
-            }
+        const res = Object.assign(response, {
+            append: Response_1.default.prototype.append.bind(response),
+            status: Response_1.default.prototype.status.bind(response),
+            send: Response_1.default.prototype.send.bind(response),
+            json: Response_1.default.prototype.json.bind(response),
+            setHeader: Response_1.default.prototype.setHeader.bind(response),
+            end: Response_1.default.prototype.end.bind(response)
+        });
+        if (!request.url || !request.method) {
+            return res.status(400).end();
+        }
+        const { url, method } = request;
+        const handlers = getRouteHandlers(this.routing, url.split('/'), ['all', method]);
+        const done = (error) => {
             if (!res.finished) {
                 if (!res.headersSent) {
-                    res.status(404);
+                    res.status(error ? 500 : 404);
+                }
+                if (error) {
+                    this.logger.error(error);
+                    res.write(`${error}`);
                 }
                 res.end();
             }
-        });
+        };
+        const next = (error) => {
+            const nextHandler = handlers.shift();
+            if (!nextHandler)
+                return done(error);
+            const [handler, params] = nextHandler;
+            const req = Object.assign(request, {
+                params
+            });
+            if (handler.length === 3) {
+                if (error)
+                    return next(error);
+                return handler
+                    .bind(this)(req, res, err => {
+                    if (err)
+                        return next(error);
+                    return next();
+                });
+            }
+            if (error)
+                return handler
+                    .bind(this)(error, req, res, err => {
+                    if (err)
+                        return next(err);
+                    return next();
+                });
+            return next();
+        };
+        next();
     }
 }
 exports.default = Server;

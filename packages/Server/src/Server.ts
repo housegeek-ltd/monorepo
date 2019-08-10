@@ -5,14 +5,14 @@ import Request, { requestParams } from './Request'
 export declare type reqHandler = (
     req: http.IncomingMessage,
     res: http.ServerResponse,
-    next: (error ?: string) => void
+    next: (error ?: Error) => void
 ) => void
 
 export declare type errHandler = (
     error: Error,
     req: http.IncomingMessage,
     res: http.ServerResponse,
-    next: (error ?: string) => void
+    next: (error ?: Error) => void
 ) => void
 
 export declare interface routing {
@@ -69,10 +69,12 @@ function getRouteHandlers (
 
 export default class Server extends http.Server {
     routing: routing = { handlers: [], routes: new Map() }
+    logger: typeof console
 
-    constructor() {
+    constructor({ logger = console }) {
         super()
-
+        
+        this.logger = logger
         this.on('request', this.handleRequest)
     }
 
@@ -90,7 +92,7 @@ export default class Server extends http.Server {
         setRouteHandler(this.routing, path.split('/'), method, handler as reqHandler | errHandler)
     }
 
-    async handleRequest (request: Request, response: Response) {
+    handleRequest (request: Request, response: Response) {
         const res: Response = Object.assign(
             response,
             {
@@ -110,8 +112,24 @@ export default class Server extends http.Server {
         const { url, method } = request
         const handlers = getRouteHandlers(this.routing, url.split('/'), ['all', method])
 
-        let unHandledError: Error | undefined
-        for (const [handler, params] of handlers) {
+        const done = (error?: Error) => {
+            if (!res.finished) {
+                if (!res.headersSent) {
+                    res.status(error ? 500 : 404)
+                }
+                if (error) {
+                    this.logger.error(error)
+                    res.write(`${error}`)
+                }
+                res.end()
+            }
+        }
+
+        const next = (error?: Error): void => {
+            const nextHandler = handlers.shift()
+            if (!nextHandler) return done(error)
+            const [handler, params] = nextHandler
+
             const req: Request = Object.assign(
                 request,
                 {
@@ -119,30 +137,25 @@ export default class Server extends http.Server {
                 }
             )
 
-            await new Promise((resolve, reject) => {
-                if (handler.length === 3 && !unHandledError) {
-                    return (handler as reqHandler).bind(this)(req, res, err => {
-                        if (err) return reject(err)
-                        return resolve()
+            if (handler.length === 3) {
+                if (error) return next(error)
+
+                return (handler as reqHandler)
+                    .bind(this)(req, res, err => {
+                        if (err) return next(error)
+                        return next()
                     })
-                }
-                if (unHandledError) {
-                    (handler as errHandler).bind(this)(unHandledError, req, res, err => {
-                        if (err) return reject(err)
-                        return resolve()
-                    })
-                    unHandledError = void 0
-                }
-            }).catch(err => {
-                unHandledError = err
-            })
+            }
+
+            if (error) return (handler as errHandler)
+                .bind(this)(error, req, res, err => {
+                    if (err) return next(err)
+                    return next()
+                })
+
+            return next()
         }
 
-        if (!res.finished) {
-            if (!res.headersSent) {
-                res.status(404)
-            }
-            res.end()
-        }
+        next()
     }
 }
