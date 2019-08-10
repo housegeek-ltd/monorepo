@@ -1,8 +1,49 @@
 version: 2.1
 jobs:
+
   build:
     docker:
       - image: circleci/node:12.8.0
     steps:
       - checkout
-      - run: ls -lahR
+      - run: npm install
+      - run: npm run compile
+      - run: npm run unittest
+
+  prerelease:
+    docker:
+      - image: circleci/node:12.8.0
+    steps:
+      - checkout
+      - run: npm install
+      - run: git reset --hard
+
+      - run: npm run compile
+      - run: npm run unittest
+
+      - run: env
+      - run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - run: npm whoami
+      - run: npm run pre-release
+      - run: git reset --hard
+
+      - run: npm run build
+      - run: npm run ci-test
+      - run: ENV=prerelease npm run deploy
+
+workflows:
+  version: 2.1
+  build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: 
+                - nightly
+                - master
+
+      - prerelease:
+          context: npm
+          filters:
+            branches:
+              only: nightly
