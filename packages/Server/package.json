@@ -1,6 +1,6 @@
 {
   "name": "@housegeek/server",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Basic http server",
   "author": "HouseGeek Ltd <dev@housegeek.co.uk>",
   "homepage": "https://github.com/housegeek-ltd/monorepo/tree/master/packages/www#readme",
