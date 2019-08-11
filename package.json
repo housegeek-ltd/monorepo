@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx lerna run --parallel test",
-    "version": "npx lerna version --no-push --yes"
+    "test": "npx lerna run --parallel test"
   },
   "repository": {
     "type": "git",
