@@ -21,9 +21,7 @@ export declare interface routing {
 }
 
 function setRouteHandler(routing: routing, urlParts: Array<string>, method: string, handler: reqHandler | errHandler) {
-    console.log(urlParts)
     const part = urlParts.shift()
-    console.log(part)
 
     if (!part) {
         return routing.handlers.push([method, handler])

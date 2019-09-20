@@ -6,9 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = __importDefault(require("http"));
 const Response_1 = __importDefault(require("./Response"));
 function setRouteHandler(routing, urlParts, method, handler) {
-    console.log(urlParts);
     const part = urlParts.shift();
-    console.log(part);
     if (!part) {
         return routing.handlers.push([method, handler]);
     }
