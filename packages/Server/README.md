@@ -5,11 +5,12 @@
 ## Usage
 
 ```sh
-npm i --save server
+npm i --save @housegeek/server
 ```
 
 ```js
-const server = require('@housegeek/server')
+const { Server } = require('@housegeek/server')
+const server = new Server()
 const hostname = 'localhost'
 const port = 8080
 
@@ -20,7 +21,7 @@ server.use((req, res, next) => {
     next()
 })
 
-server.route('GET', 'hello/:name', (req, res, next) => {
+server.route('hello/:name', 'GET', (req, res, next) => {
     const { name } = req.params
 
     return res

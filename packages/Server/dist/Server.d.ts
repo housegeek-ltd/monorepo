@@ -11,7 +11,7 @@ export declare interface routing {
 export default class Server extends http.Server {
     routing: routing;
     logger: typeof console;
-    constructor({ logger }: {
+    constructor({ logger }?: {
         logger?: Console | undefined;
     });
     use(handler: reqHandler | errHandler): void;

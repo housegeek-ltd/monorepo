@@ -6,7 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = __importDefault(require("http"));
 const Response_1 = __importDefault(require("./Response"));
 function setRouteHandler(routing, urlParts, method, handler) {
+    console.log(urlParts);
     const part = urlParts.shift();
+    console.log(part);
     if (!part) {
         return routing.handlers.push([method, handler]);
     }
@@ -33,14 +35,14 @@ function getRouteHandlers(routing, urlParts, methods = ['all'], handlers = [], p
         }
         if (key.charAt(0) === ':') {
             const paramKey = key.slice(1);
-            getRouteHandlers(value, urlParts.slice(1), methods, handlers, Object.assign({}, params, { [paramKey]: key }));
+            getRouteHandlers(value, urlParts.slice(1), methods, handlers, Object.assign({}, params, { [paramKey]: part }));
             continue;
         }
     }
     return handlers;
 }
 class Server extends http_1.default.Server {
-    constructor({ logger = console }) {
+    constructor({ logger = console } = {}) {
         super();
         this.routing = { handlers: [], routes: new Map() };
         this.logger = logger;
@@ -49,7 +51,7 @@ class Server extends http_1.default.Server {
     use(arg0, arg1) {
         const [path, handler] = typeof arg0 === 'string'
             ? [arg0, arg1]
-            : ['/', arg0];
+            : ['', arg0];
         setRouteHandler(this.routing, path.split('/'), 'all', handler);
     }
     route(path, method, handler) {
@@ -68,7 +70,7 @@ class Server extends http_1.default.Server {
             return res.status(400).end();
         }
         const { url, method } = request;
-        const handlers = getRouteHandlers(this.routing, url.split('/'), ['all', method]);
+        const handlers = getRouteHandlers(this.routing, url.split('/').slice(1), ['all', method]);
         const done = (error) => {
             if (!res.finished) {
                 if (!res.headersSent) {

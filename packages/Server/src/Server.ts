@@ -5,14 +5,14 @@ import Request, { requestParams } from './Request'
 export declare type reqHandler = (
     req: http.IncomingMessage,
     res: http.ServerResponse,
-    next: (error ?: Error) => void
+    next: (error?: Error) => void
 ) => void
 
 export declare type errHandler = (
     error: Error,
     req: http.IncomingMessage,
     res: http.ServerResponse,
-    next: (error ?: Error) => void
+    next: (error?: Error) => void
 ) => void
 
 export declare interface routing {
@@ -20,8 +20,10 @@ export declare interface routing {
     handlers: Array<[string, reqHandler | errHandler]>
 }
 
-function setRouteHandler (routing: routing, urlParts: Array<string>, method: string, handler: reqHandler | errHandler) {
+function setRouteHandler(routing: routing, urlParts: Array<string>, method: string, handler: reqHandler | errHandler) {
+    console.log(urlParts)
     const part = urlParts.shift()
+    console.log(part)
 
     if (!part) {
         return routing.handlers.push([method, handler])
@@ -36,7 +38,7 @@ function setRouteHandler (routing: routing, urlParts: Array<string>, method: str
     routing.routes.set(part, nextRouting)
 }
 
-function getRouteHandlers (
+function getRouteHandlers(
     routing: routing,
     urlParts: Array<string>,
     methods: Array<string> = ['all'],
@@ -59,7 +61,7 @@ function getRouteHandlers (
         }
         if (key.charAt(0) === ':') {
             const paramKey = key.slice(1)
-            getRouteHandlers(value, urlParts.slice(1), methods, handlers, { ...params, [paramKey]: key })
+            getRouteHandlers(value, urlParts.slice(1), methods, handlers, { ...params, [paramKey]: part })
             continue
         }
     }
@@ -71,28 +73,28 @@ export default class Server extends http.Server {
     routing: routing = { handlers: [], routes: new Map() }
     logger: typeof console
 
-    constructor({ logger = console }) {
+    constructor({ logger = console } = {}) {
         super()
-        
+
         this.logger = logger
         this.on('request', this.handleRequest)
     }
 
-    use (handler: reqHandler | errHandler): void
-    use (path: string, handler: reqHandler | errHandler): void
-    use (arg0: string | reqHandler | errHandler, arg1?: reqHandler | errHandler) {
+    use(handler: reqHandler | errHandler): void
+    use(path: string, handler: reqHandler | errHandler): void
+    use(arg0: string | reqHandler | errHandler, arg1?: reqHandler | errHandler) {
         const [path, handler] = typeof arg0 === 'string'
             ? [arg0, arg1]
-            : ['/', arg0]
+            : ['', arg0]
 
         setRouteHandler(this.routing, path.split('/'), 'all', handler as reqHandler | errHandler)
     }
 
-    route (path: string, method: string, handler: reqHandler | errHandler) {
+    route(path: string, method: string, handler: reqHandler | errHandler) {
         setRouteHandler(this.routing, path.split('/'), method, handler as reqHandler | errHandler)
     }
 
-    handleRequest (request: Request, response: Response) {
+    handleRequest(request: Request, response: Response) {
         const res: Response = Object.assign(
             response,
             {
@@ -110,7 +112,7 @@ export default class Server extends http.Server {
         }
 
         const { url, method } = request
-        const handlers = getRouteHandlers(this.routing, url.split('/'), ['all', method])
+        const handlers = getRouteHandlers(this.routing, url.split('/').slice(1), ['all', method])
 
         const done = (error?: Error) => {
             if (!res.finished) {
