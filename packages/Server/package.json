@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "npx tsc -w",
     "test": "npx nyc npx tape 'tests/**/*.test.js'",
-    "build": "npx tsc"
+    "compile": "npx tsc"
   },
   "bugs": {
     "url": "https://github.com/housegeek-ltd/monorepo/issues"
